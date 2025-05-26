@@ -54,4 +54,6 @@ pipline: |
   - The assistant will then wait for a response from the lead.
   - If the lead responds, the assistant will then notify DJ of the lead and the price and update the lead status to negotiations.
   - DJ will then respond to the lead with a counter offer or acceptance of the price.
-  - If the lead does not respond, the assistant will follow up with the lead after a few days.
+  - If the lead does not respond, the assistant will follow up with the lead after a day.
+  - If DJ and the lead agree on a price, the assistant will then change the lead status to closed_won and notify DJ of the successful negotiation.
+  - If the lead does not agree on a price, the assistant will notify DJ of the response and change the lead status to closed_lost and follow up with the lead in 30 days unless told otherwise.
