@@ -1,13 +1,13 @@
 """Fetches few shot examples for triage step."""
 
 from langgraph.store.base import BaseStore
-from eaia.schemas import EmailData
+from eaia.schemas import TextData
 
 
-template = """Email Subject: {subject}
-Email From: {from_email}
-Email To: {to_email}
-Email Content: 
+template = """
+Text From: {from_email}
+Text To: {to_email}
+Text Content: 
 ```
 {content}
 ```
@@ -19,9 +19,8 @@ def format_similar_examples_store(examples):
     for eg in examples:
         strs.append(
             template.format(
-                subject=eg.value["input"]["subject"],
-                to_email=eg.value["input"]["to_email"],
-                from_email=eg.value["input"]["from_email"],
+                to_phone_number=eg.value["input"]["to_phone_number"],
+                from_phone_number=eg.value["input"]["from_phone_number"],
                 content=eg.value["input"]["page_content"][:400],
                 result=eg.value["triage"],
             )
@@ -29,12 +28,12 @@ def format_similar_examples_store(examples):
     return "\n\n------------\n\n".join(strs)
 
 
-async def get_few_shot_examples(email: EmailData, store: BaseStore, config):
+async def get_few_shot_examples(text: TextData, store: BaseStore, config):
     namespace = (
         config["configurable"].get("assistant_id", "default"),
         "triage_examples",
     )
-    result = await store.asearch(namespace, query=str({"input": email}), limit=5)
+    result = await store.asearch(namespace, query=str({"input": text}), limit=5)
     if result is None:
         return ""
     return format_similar_examples_store(result)

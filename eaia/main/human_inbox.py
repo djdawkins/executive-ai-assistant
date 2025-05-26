@@ -3,7 +3,7 @@
 import uuid
 
 from langsmith import traceable
-from eaia.schemas import State, email_template
+from eaia.schemas import State, text_template
 from langgraph.types import interrupt
 from langgraph.store.base import BaseStore
 from typing import TypedDict, Literal, Union, Optional
@@ -63,10 +63,10 @@ async def save_email(state: State, config, store: BaseStore, status: str):
         config["configurable"].get("assistant_id", "default"),
         "triage_examples",
     )
-    key = state["email"]["id"]
+    key = state["text"]["id"]
     response = await store.aget(namespace, key)
     if response is None:
-        data = {"input": state["email"], "triage": status}
+        data = {"input": state["text"], "triage": status}
         await store.aput(namespace, str(uuid.uuid4()), data)
 
 
@@ -87,11 +87,10 @@ async def send_message(state: State, config, store):
         "description": _generate_email_markdown(state),
     }
     response = interrupt([request])[0]
-    _email_template = email_template.format(
-        email_thread=state["email"]["page_content"],
-        author=state["email"]["from_email"],
-        subject=state["email"]["subject"],
-        to=state["email"].get("to_email", ""),
+    _text_template = text_template.format(
+        text_thread=state["text"]["page_content"],
+        author=state["text"]["from_text"],
+        to=state["text"].get("to_text", ""),
     )
     if response["type"] == "response":
         msg = {
@@ -101,12 +100,12 @@ async def send_message(state: State, config, store):
             "tool_call_id": tool_call["id"],
         }
         if memory:
-            await save_email(state, config, store, "email")
+            await save_email(state, config, store, "text")
             rewrite_state = {
                 "messages": [
                     {
                         "role": "user",
-                        "content": f"Draft a response to this email:\n\n{_email_template}",
+                        "content": f"Draft a response to this text:\n\n{_text_template}",
                     }
                 ]
                 + state["messages"],
@@ -253,26 +252,25 @@ async def notify(state: State, config, store):
         "description": _generate_email_markdown(state),
     }
     response = interrupt([request])[0]
-    _email_template = email_template.format(
-        email_thread=state["email"]["page_content"],
-        author=state["email"]["from_email"],
-        subject=state["email"]["subject"],
-        to=state["email"].get("to_email", ""),
+    _text_template = text_template.format(
+        text_thread=state["text"]["page_content"],
+        author=state["text"]["from_text"],
+        to=state["text"].get("to_text", ""),
     )
     if response["type"] == "response":
         msg = {"type": "user", "content": response["args"]}
         if memory:
-            await save_email(state, config, store, "email")
+            await save_email(state, config, store, "text")
             rewrite_state = {
                 "messages": [
                     {
                         "role": "user",
-                        "content": f"Draft a response to this email:\n\n{_email_template}",
+                        "content": f"Draft a response to this text:\n\n{_text_template}",
                     }
                 ]
                 + state["messages"],
                 "feedback": f"{user} gave these instructions: {response['args']}",
-                "prompt_types": ["email", "background", "calendar"],
+                "prompt_types": ["text", "background", "calendar"],
                 "assistant_key": config["configurable"].get("assistant_id", "default"),
             }
             await LGC.runs.create(None, "multi_reflection_graph", input=rewrite_state)

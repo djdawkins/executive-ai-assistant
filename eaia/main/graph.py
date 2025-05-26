@@ -30,7 +30,7 @@ from eaia.schemas import (
 def route_after_triage(
     state: State,
 ) -> Literal["draft_response", "mark_as_read_node", "notify"]:
-    if state["triage"].response == "email":
+    if state["triage"].response == "text":
         return "draft_response"
     elif state["triage"].response == "no":
         return "mark_as_read_node"
@@ -46,10 +46,10 @@ def take_action(
     state: State,
 ) -> Literal[
     "send_message",
-    "rewrite",
+    # "rewrite",
     "mark_as_read_node",
-    "find_meeting_time",
-    "send_cal_invite",
+    # "find_meeting_time",
+    # "send_cal_invite",
     "bad_tool_name",
 ]:
     prediction = state["messages"][-1]
@@ -58,14 +58,14 @@ def take_action(
     tool_call = prediction.tool_calls[0]
     if tool_call["name"] == "Question":
         return "send_message"
-    elif tool_call["name"] == "ResponseEmailDraft":
-        return "rewrite"
-    elif tool_call["name"] == "Ignore":
+    elif tool_call["name"] == "ResponseTextDraft":
         return "mark_as_read_node"
-    elif tool_call["name"] == "MeetingAssistant":
-        return "find_meeting_time"
-    elif tool_call["name"] == "SendCalendarInvite":
-        return "send_cal_invite"
+    # elif tool_call["name"] == "Ignore":
+    #     return "mark_as_read_node"
+    # elif tool_call["name"] == "MeetingAssistant":
+    #     return "find_meeting_time"
+    # elif tool_call["name"] == "SendCalendarInvite":
+    #     return "send_cal_invite"
     else:
         return "bad_tool_name"
 
@@ -88,7 +88,7 @@ def bad_tool_name(state: State):
 def enter_after_human(
     state,
 ) -> Literal[
-    "mark_as_read_node", "draft_response", "send_email_node", "send_cal_invite_node"
+    "mark_as_read_node", "draft_response"
 ]:
     messages = state.get("messages") or []
     if len(messages) == 0:
@@ -146,7 +146,8 @@ def send_email_node(state, config):
 
 
 def mark_as_read_node(state):
-    mark_as_read(state["email"]["id"])
+    # mark_as_read(state["text"]["id"])
+    print("Marked as read:", state["text"]["id"])
 
 
 def human_node(state: State):
@@ -163,27 +164,39 @@ graph_builder.add_node(human_node)
 graph_builder.add_node(triage_input)
 graph_builder.add_node(draft_response)
 graph_builder.add_node(send_message)
-graph_builder.add_node(rewrite)
+
+# graph_builder.add_node(rewrite)
 graph_builder.add_node(mark_as_read_node)
-graph_builder.add_node(send_email_draft)
-graph_builder.add_node(send_email_node)
+# graph_builder.add_node(send_email_draft)
+# graph_builder.add_node(send_email_node)
+
 graph_builder.add_node(bad_tool_name)
 graph_builder.add_node(notify)
-graph_builder.add_node(send_cal_invite_node)
-graph_builder.add_node(send_cal_invite)
+
+# graph_builder.add_node(send_cal_invite_node)
+# graph_builder.add_node(send_cal_invite)
+
 graph_builder.add_conditional_edges("triage_input", route_after_triage)
 graph_builder.set_entry_point("triage_input")
 graph_builder.add_conditional_edges("draft_response", take_action)
 graph_builder.add_edge("send_message", "human_node")
-graph_builder.add_edge("send_cal_invite", "human_node")
-graph_builder.add_node(find_meeting_time)
-graph_builder.add_edge("find_meeting_time", "draft_response")
+
+# graph_builder.add_edge("send_cal_invite", "human_node")
+# graph_builder.add_node(find_meeting_time)
+# graph_builder.add_edge("find_meeting_time", "draft_response")
+
 graph_builder.add_edge("bad_tool_name", "draft_response")
-graph_builder.add_edge("send_cal_invite_node", "draft_response")
-graph_builder.add_edge("send_email_node", "mark_as_read_node")
-graph_builder.add_edge("rewrite", "send_email_draft")
-graph_builder.add_edge("send_email_draft", "human_node")
+
+# graph_builder.add_edge("send_cal_invite_node", "draft_response")
+# graph_builder.add_edge("send_email_node", "mark_as_read_node")
+# graph_builder.add_edge("rewrite", "send_email_draft")
+# graph_builder.add_edge("send_email_draft", "human_node")
 graph_builder.add_edge("mark_as_read_node", END)
+
 graph_builder.add_edge("notify", "human_node")
 graph_builder.add_conditional_edges("human_node", enter_after_human)
 graph = graph_builder.compile()
+
+from IPython.display import display, Image
+
+display(Image(graph.get_graph().draw_mermaid_png()))
