@@ -5,8 +5,8 @@ from eaia.schemas import TextData
 
 
 template = """
-Text From: {from_email}
-Text To: {to_email}
+Text From: {from_phone_number}
+Text To: {to_phone_number}
 Text Content: 
 ```
 {content}

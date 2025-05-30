@@ -53,7 +53,7 @@ async def triage_input(state: State, config: RunnableConfig, store: BaseStore):
         full_name=prompt_config["full_name"],
         background=prompt_config["background"],
         triage_no=prompt_config["triage_no"],
-        triage_email=prompt_config["triage_email"],
+        triage_text=prompt_config["triage_text"],
         triage_notify=prompt_config["triage_notify"],
     )
     model = llm.with_structured_output(RespondTo).bind(

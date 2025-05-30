@@ -100,11 +100,11 @@ def enter_after_human(
             return "draft_response"
         else:
             execute = messages[-1].tool_calls[0]
-            if execute["name"] == "ResponseEmailDraft":
-                return "send_email_node"
-            elif execute["name"] == "SendCalendarInvite":
-                return "send_cal_invite_node"
-            elif execute["name"] == "Ignore":
+            # if execute["name"] == "ResponseEmailDraft":
+            #     return "send_email_node"
+            # elif execute["name"] == "SendCalendarInvite":
+            #     return "send_cal_invite_node"
+            if execute["name"] == "Ignore":
                 return "mark_as_read_node"
             elif execute["name"] == "Question":
                 return "draft_response"
@@ -197,6 +197,31 @@ graph_builder.add_edge("notify", "human_node")
 graph_builder.add_conditional_edges("human_node", enter_after_human)
 graph = graph_builder.compile()
 
-from IPython.display import display, Image
+async def run_graph():
+    await graph.ainvoke(
+        input={
+            "text":
+                {
+                    # example of a text message
+                    "id": "str",
+                    "thread_id": "str",
+                    "from_phone_number": "str",
+                    "text_content": "str",
+                    "send_time": "str",
+                    "to_phone_number": "str"
+                }
+        },
+        # config=get_config(config)
+        subgraphs=True
+    )
 
-display(Image(graph.get_graph().draw_mermaid_png()))
+import asyncio
+import os
+from dotenv import load_dotenv
+
+# Run the multi-agent graph
+# Load environment variables from .env file
+load_dotenv()
+# Add this at the bottom of your graph.py file
+if __name__ == "__main__":
+    asyncio.run(run_graph())
