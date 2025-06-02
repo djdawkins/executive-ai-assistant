@@ -36,25 +36,21 @@ class HumanResponse(TypedDict):
     args: Union[None, str, ActionRequest]
 
 
-TEMPLATE = """# {subject}
-
-[Click here to view the email]({url})
+TEMPLATE = """#
 
 **To**: {to}
 **From**: {_from}
 
-{page_content}
+{text_content}
 """
 
 
 def _generate_email_markdown(state: State):
-    contents = state["email"]
+    contents = state["text"]
     return TEMPLATE.format(
-        subject=contents["subject"],
-        url=f"https://mail.google.com/mail/u/0/#inbox/{contents['id']}",
-        to=contents["to_email"],
-        _from=contents["from_email"],
-        page_content=contents["page_content"],
+        to=contents["to_phone_number"],
+        _from=contents["from_phone_number"],
+        text_content=contents["text_content"],
     )
 
 
@@ -86,12 +82,17 @@ async def send_message(state: State, config, store):
         },
         "description": _generate_email_markdown(state),
     }
-    response = interrupt([request])[0]
+    print("Requesting human input for tool call:", request)
+    responses = interrupt([request])
+    response = responses[0]
+    print("Response from human input:", response)
     _text_template = text_template.format(
-        text_thread=state["text"]["page_content"],
-        author=state["text"]["from_text"],
-        to=state["text"].get("to_text", ""),
+        text_thread=state["text"]["text_content"],
+        author=state["text"]["from_phone_number"],
+        to=state["text"].get("to_phone_number", ""),
     )
+
+    print("Requesting human input for tool call:", response)
     if response["type"] == "response":
         msg = {
             "type": "tool",
