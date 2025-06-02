@@ -5,24 +5,25 @@ from langgraph_sdk import get_client
 import uuid
 import hashlib
 
-from eaia.schemas import EmailData
-
+from eaia.schemas import EmailData, TextData
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 async def main():
     client = get_client(url="http://127.0.0.1:2024")
-
-    email: EmailData = {
-        "from_email": "Test",
-        "to_email": "test@gmail.com",
-        "subject": "Re: Hello!",
-        "page_content": "Test",
-        "id": "123",
-        "thread_id": "123",
+    # initial state
+    intial_messages = [HumanMessage(content="""Hi, my name is DJ from Rosedale Capital. Would you be interested in a proposal for your vacant lot in Cape Coral?reply "Yes" for more info. reply "End" to quit.""")]
+    
+    text: TextData = {
+        "id": "test",
+        "thread_id": "test",
+        "from_phone_number": "+14802909934",
+        "text_content": "yes",
         "send_time": "2024-12-26T13:13:41-08:00",
+        "to_phone_number": "+1234567890",
     }
 
     thread_id = str(
-        uuid.UUID(hex=hashlib.md5(email["thread_id"].encode("UTF-8")).hexdigest())
+        uuid.UUID(hex=hashlib.md5(text["thread_id"].encode("UTF-8")).hexdigest())
     )
     try:
         await client.threads.delete(thread_id)
@@ -32,7 +33,7 @@ async def main():
     await client.runs.create(
         thread_id,
         "main",
-        input={"email": email},
+        input={"text": text, "messages": intial_messages},
         multitask_strategy="rollback",
     )
 
