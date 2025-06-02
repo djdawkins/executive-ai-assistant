@@ -22,6 +22,9 @@ from eaia.gmail import (
     mark_as_read,
     send_calendar_invite,
 )
+from eaia.main.onboarding import (
+    onboarding,
+)
 from eaia.schemas import (
     State,
 )
@@ -29,9 +32,11 @@ from eaia.schemas import (
 
 def route_after_triage(
     state: State,
-) -> Literal["draft_response", "mark_as_read_node", "notify"]:
+) -> Literal["draft_response", "mark_as_read_node", "notify", "onboarding"]:
     if state["triage"].response == "text":
         return "draft_response"
+    elif state["triage"].response == "onboard":
+        return "onboarding"
     elif state["triage"].response == "no":
         return "mark_as_read_node"
     elif state["triage"].response == "notify":
@@ -48,7 +53,6 @@ def take_action(
     "send_message",
     # "rewrite",
     "mark_as_read_node",
-    # "find_meeting_time",
     # "send_cal_invite",
     "bad_tool_name",
 ]:
@@ -173,7 +177,7 @@ graph_builder.add_node(mark_as_read_node)
 graph_builder.add_node(bad_tool_name)
 graph_builder.add_node(notify)
 
-# graph_builder.add_node(send_cal_invite_node)
+graph_builder.add_node(onboarding)
 # graph_builder.add_node(send_cal_invite)
 
 graph_builder.add_conditional_edges("triage_input", route_after_triage)
@@ -192,36 +196,8 @@ graph_builder.add_edge("bad_tool_name", "draft_response")
 # graph_builder.add_edge("rewrite", "send_email_draft")
 # graph_builder.add_edge("send_email_draft", "human_node")
 graph_builder.add_edge("mark_as_read_node", END)
+graph_builder.add_edge("onboarding", END)
 
 graph_builder.add_edge("notify", "human_node")
 graph_builder.add_conditional_edges("human_node", enter_after_human)
 graph = graph_builder.compile()
-
-async def run_graph():
-    await graph.ainvoke(
-        input={
-            "text":
-                {
-                    # example of a text message
-                    "id": "str",
-                    "thread_id": "str",
-                    "from_phone_number": "str",
-                    "text_content": "str",
-                    "send_time": "str",
-                    "to_phone_number": "str"
-                }
-        },
-        # config=get_config(config)
-        subgraphs=True
-    )
-
-import asyncio
-import os
-from dotenv import load_dotenv
-
-# Run the multi-agent graph
-# Load environment variables from .env file
-load_dotenv()
-# Add this at the bottom of your graph.py file
-if __name__ == "__main__":
-    asyncio.run(run_graph())
