@@ -24,12 +24,26 @@ class TextData(TypedDict):
     send_time: str
     to_phone_number: str
 
+class ProspectData(TypedDict):
+    first_name: str
+    last_name: str
+    phone_number: str
+    prop_street: str
+    prop_city: str
+    prop_state: str
+    prop_zip: str
+    updated_at: str
+    contact_info_confirmed: bool
+    status: Literal["new", "on_boarding", "dnd", "negotiating", "contract_sent", "closed_won", "closed_lost"] = "new"
+    # status = ['new', 'contact_confirmed', 'needs_followup', 'proposal_sent', 'negotiating', 'closed_won', 'closed_lost', 'unknown_lead', 'unknown_response']
+    follow_up_date: str | None
+
 
 class RespondTo(BaseModel):
     logic: str = Field(
         description="logic on WHY the response choice is the way it is", default=""
     )
-    response: Literal["no", "text", "notify", "question"] = "no"
+    response: Literal["no", "text", "notify", "question", "onboard"] = "no"
 
 
 class ResponseTextDraft(BaseModel):
@@ -45,6 +59,10 @@ class NewTextDraft(BaseModel):
     content: str
     recipients: List[str]
 
+class ContactConfirmResponse(BaseModel):
+    """Response to confirm contact info."""
+
+    response: str = "Okay great. The property address is 930 Ne 43rd Ter Cape Coral, FL and your name is Ken Stewart correct?"
 
 class ReWriteText(BaseModel):
     """Logic for rewriting an text"""
@@ -79,9 +97,10 @@ class State(TypedDict):
     text: TextData
     triage: Annotated[RespondTo, convert_obj]
     messages: Annotated[List[AnyMessage], add_messages]
+    prospect: ProspectData
 
 
-text_template = """From: {author}
-To: {to}
-
-{text_thread}"""
+text_template = """
+Okay great. 
+The property address is {prop_street} {prop_city}, {prop_state} and your name is {first_name} {last_name} correct?
+"""
