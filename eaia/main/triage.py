@@ -24,10 +24,13 @@ Texts that are worth responding to:
 {triage_text}
 
 The lead status for the prospect is "{lead_status}".
-Follow this exactly the the lead status for the prospect determines how you triage the text. 
-If the lead status is "new" or "onboarding", you should always respond `onboard`.
+Follow this exactly, the lead status for the prospect and their resonse determines how you triage the text. 
+If the lead status is "new" or "onboarding", and the response is confirming to the compliance text or the contact info, you should always respond `onboard`.
+If the lead status is "new" or "onboarding", and the response is not confirming to the compliance text or the contact info, you should always respond `notify`.
 
-If the lead status is "ready_for_initial_offer", you should always respond `text`.
+If the lead status is "ready_for_initial_offer", you should always respond `notify`.
+If the lead status is "negotiating", you should always respond `text`.
+
 There are also other things that {name} should know about, but don't require a text response. For these, you should notify {name} (using the `notify` response). Examples of this include:
 {triage_notify}
 
