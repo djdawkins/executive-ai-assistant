@@ -21,14 +21,11 @@ TEXT_WRITING_INSTRUCTIONS = """You are {full_name}'s executive assistant. You ar
 Your job is to help {name} decide how to respond. 
 You can do this by responding with one of the following keywords:
 
-# ContactConfirmResponse 
-
 First, the contact confirm information is a boolean that indicates whether the contact is confirmed. 
 The contact confirm information value is {contact_confirm}.
 Follow this exactly,
 If the contact confirm information is "False", you should always respond with the `ContactConfirmResponse`.
-
-
+If the contact confirm information is "True", you should always respond with the `LandSurvey`.
 """
 draft_prompt = """{instructions}
 
@@ -79,7 +76,7 @@ async def onboarding(state: State, config: RunnableConfig, store: BaseStore):
             last_name=state["prospect"]["last_name"],
         )
         messages += [{"role": "user", "content": text}]
-        prospect["contact_info_confirmed"] = True
+        prospect["opt_in"] = True
         prospect["status"] = "onboarding"
         prospect["follow_up_date"] = datetime.now().date()
 

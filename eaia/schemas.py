@@ -35,6 +35,7 @@ class ProspectData(TypedDict):
     prop_state: str
     prop_zip: str
     updated_at: str
+    opt_in: bool
     contact_info_confirmed: bool
     status: Literal["new", "onboarding", "ready_for_initial_offer", "dnd", "negotiating", "contract_sent", "closed_won", "closed_lost"] = "new"
     # status = ['new', 'contact_confirmed', 'needs_followup', 'proposal_sent', 'negotiating', 'closed_won', 'closed_lost', 'unknown_lead', 'unknown_response']
