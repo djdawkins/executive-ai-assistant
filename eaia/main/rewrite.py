@@ -2,7 +2,7 @@
 
 from langchain_openai import ChatOpenAI
 
-from eaia.schemas import State, ReWriteEmail
+from eaia.schemas import State
 
 from eaia.main.config import get_config
 
