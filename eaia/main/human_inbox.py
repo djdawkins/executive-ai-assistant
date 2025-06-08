@@ -100,6 +100,7 @@ async def send_message(state: State, config, store):
             "content": response["args"],
             "tool_call_id": tool_call["id"],
         }
+        memory = False # override memory for text responses
         if memory:
             await save_email(state, config, store, "text")
             rewrite_state = {
