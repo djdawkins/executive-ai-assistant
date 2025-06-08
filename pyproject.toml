@@ -25,6 +25,7 @@ langgraph-prebuilt = "^0.2.2"
 langgraph-api = "^0.2.42"
 gotrue = "^2.12.0"
 deprecation = "^2.1.0"
+supabase = "^2.15.2"
 
 [tool.setuptools.packages.find]
 where = ["src"]
