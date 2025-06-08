@@ -40,6 +40,9 @@ ALWAYS draft texts as if they are coming from {name}. Never draft them as "{name
 
 Do NOT make up texts.
 
+The context for the text is the full text thread, which you can see below. You can use this to help you determine a response.
+{text_thread}
+
 {response_preferences}
 
 # Background information: information you may find helpful when responding to texts or deciding what to do.
@@ -73,13 +76,13 @@ async def draft_response(state: State, config: RunnableConfig, store: BaseStore)
         tools.append(Ignore)
     prompt_config = get_config(config)
     namespace = (config["configurable"].get("assistant_id", "default"),)
-    key = "schedule_preferences"
-    result = await store.aget(namespace, key)
-    if result and "data" in result.value:
-        schedule_preferences = result.value["data"]
-    else:
-        await store.aput(namespace, key, {"data": prompt_config["schedule_preferences"]})
-        schedule_preferences = prompt_config["schedule_preferences"]
+    # key = "text_thread"
+    # result = await store.aget(namespace, key)
+    # if result and "data" in result.value:
+    #     text_thread = result.value["data"]
+    # else:
+    #     await store.aput(namespace, key, {"data": prompt_config["text_thread"]})
+    #     text_thread = prompt_config["text_thread"]
     key = "random_preferences"
     result = await store.aget(namespace, key)
     if result and "data" in result.value:
@@ -97,19 +100,20 @@ async def draft_response(state: State, config: RunnableConfig, store: BaseStore)
         await store.aput(namespace, key, {"data": prompt_config["response_preferences"]})
         response_preferences = prompt_config["response_preferences"]
     _prompt = TEXT_WRITING_INSTRUCTIONS.format(
-        schedule_preferences=schedule_preferences,
+        text_thread=state["messages"][-1].content if messages else "",
         random_preferences=random_preferences,
         response_preferences=response_preferences,
         name=prompt_config["name"],
         full_name=prompt_config["full_name"],
         background=prompt_config["background"],
     )
+    print(state["messages"][-1])
     input_message = draft_prompt.format(
         instructions=_prompt,
         text=text_template.format(
-            text_thread=state["text"]["page_content"],
-            author=state["text"]["from_text"],
-            to=state["text"].get("to_text", ""),
+            text_thread=state["text"]["text_content"],
+            author=state["text"]["from_phone_number"],
+            to=state["text"].get("to_phone_number", ""),
         ),
     )
 
