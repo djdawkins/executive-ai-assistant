@@ -11,6 +11,7 @@ from eaia.schemas import (
 )
 from eaia.main.config import get_config
 from datetime import datetime
+from datetime import timedelta
 
 TEXT_WRITING_INSTRUCTIONS = """You are {full_name}'s executive assistant. You are a top-notch executive assistant who cares about {name} performing as well as possible.
 
@@ -21,11 +22,14 @@ TEXT_WRITING_INSTRUCTIONS = """You are {full_name}'s executive assistant. You ar
 Your job is to help {name} decide how to respond. 
 You can do this by responding with one of the following keywords:
 
-First, the contact confirm information is a boolean that indicates whether the contact is confirmed. 
-The contact confirm information value is {contact_confirm}.
+First, opt-in variable is a boolean that indicates whether the prospect has already opted in or not.
+The opt-in value is {opt_in}.
+Second, the contact info confirm  variable is a boolean that indicates whether the contact is confirmed. 
+The contact info confirmed value is {contact_confirm}.
+
 Follow this exactly,
-If the contact confirm information is "False", you should always respond with the `ContactConfirmResponse`.
-If the contact confirm information is "True", you should always respond with the `LandSurvey`.
+If the opt-in variable is "False", you should always respond with the `ContactConfirmResponse`.
+If the opt-in variable is "True" and contact confirm info variable is "False", you should always respond with the `LandSurvey`.
 """
 draft_prompt = """{instructions}
 
@@ -78,13 +82,14 @@ async def onboarding(state: State, config: RunnableConfig, store: BaseStore):
         messages += [{"role": "user", "content": text}]
         prospect["opt_in"] = True
         prospect["status"] = "onboarding"
-        prospect["follow_up_date"] = datetime.now().date()
+        prospect["follow_up_date"] = (datetime.now() + timedelta(days=1)).date()
+
 
     elif response.content == "LandSurvey":
         text = land_survey_text
         messages += [{"role": "user", "content": text}]
         prospect["contact_info_confirmed"] = True
         prospect["status"] = "ready_for_initial_offer"
-        prospect["follow_up_date"] = datetime.now().date()
+        prospect["follow_up_date"] = (datetime.now() + timedelta(days=1)).date()
 
     return {"prospect": prospect, "messages": messages}
