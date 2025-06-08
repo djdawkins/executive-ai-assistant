@@ -2,10 +2,12 @@ from typing import Annotated, List, Literal
 from pydantic import BaseModel, Field
 from langgraph.graph.message import AnyMessage
 from typing_extensions import TypedDict
-
+import logging
+from langchain.tools import tool
+from langgraph.graph import StateGraph
 
 from langgraph.graph import add_messages
-
+from langgraph.prebuilt import InjectedState
 
 class EmailData(TypedDict):
     id: str
@@ -34,7 +36,7 @@ class ProspectData(TypedDict):
     prop_zip: str
     updated_at: str
     contact_info_confirmed: bool
-    status: Literal["new", "on_boarding", "dnd", "negotiating", "contract_sent", "closed_won", "closed_lost"] = "new"
+    status: Literal["new", "onboarding", "ready_for_initial_offer", "dnd", "negotiating", "contract_sent", "closed_won", "closed_lost"] = "new"
     # status = ['new', 'contact_confirmed', 'needs_followup', 'proposal_sent', 'negotiating', 'closed_won', 'closed_lost', 'unknown_lead', 'unknown_response']
     follow_up_date: str | None
 
@@ -58,11 +60,6 @@ class NewTextDraft(BaseModel):
 
     content: str
     recipients: List[str]
-
-class ContactConfirmResponse(BaseModel):
-    """Response to confirm contact info."""
-
-    response: str = "Okay great. The property address is 930 Ne 43rd Ter Cape Coral, FL and your name is Ken Stewart correct?"
 
 class ReWriteText(BaseModel):
     """Logic for rewriting an text"""
@@ -103,4 +100,9 @@ class State(TypedDict):
 text_template = """
 Okay great. 
 The property address is {prop_street} {prop_city}, {prop_state} and your name is {first_name} {last_name} correct?
+"""
+
+land_survey_text = """
+We’re going to send out the Land Evaluation team to conduct a pre-evaluation of the land. 
+If we come up with a number that works for the both of us, will you be ready to move forward?
 """
