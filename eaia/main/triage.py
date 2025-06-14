@@ -25,8 +25,7 @@ Texts that are worth responding to:
 
 The lead status for the prospect is "{lead_status}".
 Follow this exactly, the lead status for the prospect and their resonse determines how you triage the text. 
-If the lead status is "new" or "onboarding", and the response is confirming to the compliance text or the contact info, you should always respond `onboard`.
-If the lead status is "new" or "onboarding", and the response is not confirming to the compliance text or the contact info, you should always respond `notify`.
+If the response is positive and the lead status is "new" or "onboarding", you should always respond `onboard`.
 
 If the lead status is "ready_for_initial_offer", you should always respond `notify`.
 If the lead status is "negotiating", you should always respond `text`.
@@ -39,10 +38,7 @@ For texts not worth responding to, respond `no`. For something where {name} shou
 If unsure, opt to `notify` {name} - you will learn from this in the future.
 {fewshotexamples}
 
-Please determine how to handle the below text thread:
-
-From: {author}
-To: {to}
+Below is the response from the prospect:
 
 {text_thread}"""
 
