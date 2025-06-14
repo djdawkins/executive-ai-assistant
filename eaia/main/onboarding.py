@@ -10,8 +10,7 @@ from eaia.schemas import (
     , land_survey_text
 )
 from eaia.main.config import get_config
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, date, timedelta
 
 TEXT_WRITING_INSTRUCTIONS = """You are {full_name}'s executive assistant. You are a top-notch executive assistant who cares about {name} performing as well as possible.
 
@@ -54,6 +53,7 @@ async def onboarding(state: State, config: RunnableConfig, store: BaseStore):
 
     _prompt = TEXT_WRITING_INSTRUCTIONS.format(
         contact_confirm=state["prospect"]["contact_info_confirmed"],
+        opt_in=state["prospect"]["opt_in"],
         name=prompt_config["name"],
         full_name=prompt_config["full_name"],
         background=prompt_config["background"],
@@ -82,7 +82,8 @@ async def onboarding(state: State, config: RunnableConfig, store: BaseStore):
         messages += [{"role": "user", "content": text}]
         prospect["opt_in"] = True
         prospect["status"] = "onboarding"
-        prospect["follow_up_date"] = (datetime.now() + timedelta(days=1)).date()
+        today = date.today().isoformat()
+        prospect["follow_up_date"] = (date.fromisoformat(today) + timedelta(days=1)).isoformat()
 
 
     elif response.content == "LandSurvey":
@@ -90,6 +91,7 @@ async def onboarding(state: State, config: RunnableConfig, store: BaseStore):
         messages += [{"role": "user", "content": text}]
         prospect["contact_info_confirmed"] = True
         prospect["status"] = "ready_for_initial_offer"
-        prospect["follow_up_date"] = (datetime.now() + timedelta(days=1)).date()
+        today = date.today().isoformat()
+        prospect["follow_up_date"] = (date.fromisoformat(today) + timedelta(days=1)).isoformat()
 
     return {"prospect": prospect, "messages": messages}
