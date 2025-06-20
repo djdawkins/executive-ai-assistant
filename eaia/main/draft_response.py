@@ -40,6 +40,10 @@ ALWAYS draft texts as if they are coming from {name}. Never draft them as "{name
 
 Do NOT make up texts.
 
+The lead status for the prospect is "{lead_status}".
+If the lead status is ready_for_initial_offer, then respond using the following template:
+"Based on new construction, we can offer you a price of $X. This is based on the current market conditions and the value of your property."
+
 The context for the text is the full text thread, which you can see below. You can use this to help you determine a response.
 {text_thread}
 
@@ -48,6 +52,7 @@ The context for the text is the full text thread, which you can see below. You c
 # Background information: information you may find helpful when responding to texts or deciding what to do.
 
 {random_preferences}"""
+
 draft_prompt = """{instructions}
 
 Remember to call a tool correctly! Use the specified names exactly - not add `functions::` to the start. Pass all required arguments.
@@ -72,8 +77,11 @@ async def draft_response(state: State, config: RunnableConfig, store: BaseStore)
         Question,
     ]
     messages = state.get("messages") or []
+    prospect = state.get("prospect") or []
+
     if len(messages) > 0:
         tools.append(Ignore)
+
     prompt_config = get_config(config)
     namespace = (config["configurable"].get("assistant_id", "default"),)
     # key = "text_thread"
@@ -99,22 +107,28 @@ async def draft_response(state: State, config: RunnableConfig, store: BaseStore)
     else:
         await store.aput(namespace, key, {"data": prompt_config["response_preferences"]})
         response_preferences = prompt_config["response_preferences"]
+    
     _prompt = TEXT_WRITING_INSTRUCTIONS.format(
-        text_thread=state["messages"][-1].content if messages else "",
+        text_thread=prospect.get("last_message_received", ""),
         random_preferences=random_preferences,
         response_preferences=response_preferences,
         name=prompt_config["name"],
         full_name=prompt_config["full_name"],
         background=prompt_config["background"],
+        lead_status=prospect.get("status", ""),
     )
-    print(state["messages"][-1])
+
+    # print(state["messages"][-1])
+
     input_message = draft_prompt.format(
         instructions=_prompt,
-        text=text_template.format(
-            text_thread=state["text"]["text_content"],
-            author=state["text"]["from_phone_number"],
-            to=state["text"].get("to_phone_number", ""),
-        ),
+        text = text_template.format(
+            prop_street=state["prospect"]["prop_street"] ,
+            prop_city=state["prospect"]["prop_city"],
+            prop_state=state["prospect"]["prop_state"],
+            first_name=state["prospect"]["first_name"],
+            last_name=state["prospect"]["last_name"],
+        )
     )
 
     model = llm.bind_tools(tools)

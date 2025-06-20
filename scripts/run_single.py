@@ -18,7 +18,7 @@ The property address is 2531 E Monroe St Phoenix, AZ and your name is Sheet Meta
                 ]
     text: TextData = {
         "id": "test",
-        "thread_id": "test_9",
+        "thread_id": "test_20",
         "from_phone_number": "+14802909934",
         "text_content": "yes",
         "send_time": "2024-12-26T13:13:41-08:00",
@@ -33,14 +33,14 @@ The property address is 2531 E Monroe St Phoenix, AZ and your name is Sheet Meta
         "opt_in":True,
         "contact_info_confirmed":False,
         "messages_sent":0,
-        "status":"onboarding",
+        "status":"ready_for_initial_offer",
         "updated_at":"2025-06-01T21:13:06.63518",
         "id":21,
         "prop_street":"2531 E Monroe St",
         "prop_city":"Phoenix",
         "prop_state":"AZ",
         "prop_zip":"85034",
-        "message_history":[],
+        "follow_up_date":"2025-06-15",
     }
 
     thread_id = str(

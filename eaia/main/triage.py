@@ -12,6 +12,7 @@ from eaia.schemas import (
 )
 from eaia.main.fewshot import get_few_shot_examples
 from eaia.main.config import get_config
+from datetime import datetime, date, timedelta
 
 
 triage_prompt = """You are {full_name}'s executive assistant. You are a top-notch executive assistant who cares about {name} performing as well as possible.
@@ -27,7 +28,10 @@ The lead status for the prospect is "{lead_status}".
 Follow this exactly, the lead status for the prospect and their resonse determines how you triage the text. 
 If the response is positive and the lead status is "new" or "onboarding", you should always respond `onboard`.
 
-If the lead status is "ready_for_initial_offer", you should always respond `notify`.
+The is_past_follow_up variable is a boolean that indicates whether the follow up date is past or not, and it's value is {is_past_follow_up}.
+If the lead status is "ready_for_initial_offer", and the is_past_follow_up is "True", you should always respond `text`.
+If the lead status is "ready_for_initial_offer", and the is_past_follow_up is "False", you should always respond `notify`.
+
 If the lead status is "negotiating", you should always respond `text`.
 
 There are also other things that {name} should know about, but don't require a text response. For these, you should notify {name} (using the `notify` response). Examples of this include:
@@ -50,6 +54,19 @@ async def triage_input(state: State, config: RunnableConfig, store: BaseStore):
     prompt_config = get_config(config)
     # prospect_info = get_contact_view_data(state["text"]["from_phone_number"])
     prospect_info = get_contact_view_data('+16025991760')
+    follow_up_date = prospect_info["follow_up_date"]
+
+    # Convert follow_up_date to a date object if it's a string
+    if isinstance(follow_up_date, str):
+        follow_up_date = datetime.strptime(follow_up_date, "%Y-%m-%d").date()
+    
+    print(f"Follow up date: {follow_up_date}, today: {date.today()}")
+    if follow_up_date > date.today():
+        is_past_follow_up = False
+
+    else:
+        is_past_follow_up = True
+
     input_message = triage_prompt.format(
         text_thread=state["text"]["text_content"],
         author=state["text"]["from_phone_number"],
@@ -61,7 +78,9 @@ async def triage_input(state: State, config: RunnableConfig, store: BaseStore):
         triage_no=prompt_config["triage_no"],
         triage_text=prompt_config["triage_text"],
         triage_notify=prompt_config["triage_notify"],
-        lead_status=prospect_info["status"] 
+        lead_status=prospect_info["status"],
+        is_past_follow_up=is_past_follow_up
+        ,
     )
     model = llm.with_structured_output(RespondTo).bind(
         tool_choice={"type": "function", "function": {"name": "RespondTo"}}

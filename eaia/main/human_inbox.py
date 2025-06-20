@@ -84,55 +84,57 @@ async def send_message(state: State, config, store):
     }
     print("Requesting human input for tool call:", request)
     responses = interrupt([request])
-    response = responses[0]
+    response = responses
     print("Response from human input:", response)
     _text_template = text_template.format(
-        text_thread=state["text"]["text_content"],
-        author=state["text"]["from_phone_number"],
-        to=state["text"].get("to_phone_number", ""),
+        prop_street=state["prospect"]["prop_street"] ,
+        prop_city=state["prospect"]["prop_city"],
+        prop_state=state["prospect"]["prop_state"],
+        first_name=state["prospect"]["first_name"],
+        last_name=state["prospect"]["last_name"],
     )
 
     print("Requesting human input for tool call:", response)
-    if response["type"] == "response":
-        msg = {
-            "type": "tool",
-            "name": tool_call["name"],
-            "content": response["args"],
-            "tool_call_id": tool_call["id"],
-        }
-        memory = False # override memory for text responses
-        if memory:
-            await save_email(state, config, store, "text")
-            rewrite_state = {
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": f"Draft a response to this text:\n\n{_text_template}",
-                    }
-                ]
-                + state["messages"],
-                "feedback": f"{user} responded in this way: {response['args']}",
-                "prompt_types": ["background"],
-                "assistant_key": config["configurable"].get("assistant_id", "default"),
-            }
-            await LGC.runs.create(None, "multi_reflection_graph", input=rewrite_state)
-    elif response["type"] == "ignore":
-        msg = {
-            "role": "assistant",
-            "content": "",
-            "id": state["messages"][-1].id,
-            "tool_calls": [
+    # if response["type"] == "response":
+    msg = {
+        "type": "tool",
+        "name": tool_call["name"],
+        "content": response,
+        "tool_call_id": tool_call["id"],
+    }
+    memory = False # override memory for text responses
+    if memory:
+        await save_email(state, config, store, "text")
+        rewrite_state = {
+            "messages": [
                 {
-                    "id": tool_call["id"],
-                    "name": "Ignore",
-                    "args": {"ignore": True},
+                    "role": "user",
+                    "content": f"Draft a response to this text:\n\n{_text_template}",
                 }
-            ],
+            ]
+            + state["messages"],
+            "feedback": f"{user} responded in this way: {response['args']}",
+            "prompt_types": ["background"],
+            "assistant_key": config["configurable"].get("assistant_id", "default"),
         }
-        if memory:
-            await save_email(state, config, store, "no")
-    else:
-        raise ValueError(f"Unexpected response: {response}")
+        await LGC.runs.create(None, "multi_reflection_graph", input=rewrite_state)
+    # elif response["type"] == "ignore":
+    #     msg = {
+    #         "role": "assistant",
+    #         "content": "",
+    #         "id": state["messages"][-1].id,
+    #         "tool_calls": [
+    #             {
+    #                 "id": tool_call["id"],
+    #                 "name": "Ignore",
+    #                 "args": {"ignore": True},
+    #             }
+    #         ],
+    #     }
+    #     if memory:
+    #         await save_email(state, config, store, "no")
+    # else:
+    #     raise ValueError(f"Unexpected response: {response}")
 
     return {"messages": [msg]}
 
@@ -255,9 +257,11 @@ async def notify(state: State, config, store):
     }
     response = interrupt([request])[0]
     _text_template = text_template.format(
-        text_thread=state["text"]["page_content"],
-        author=state["text"]["from_text"],
-        to=state["text"].get("to_text", ""),
+            prop_street=state["prospect"]["prop_street"] ,
+            prop_city=state["prospect"]["prop_city"],
+            prop_state=state["prospect"]["prop_state"],
+            first_name=state["prospect"]["first_name"],
+            last_name=state["prospect"]["last_name"],
     )
     if response["type"] == "response":
         msg = {"type": "user", "content": response["args"]}
