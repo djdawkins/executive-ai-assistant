@@ -61,10 +61,12 @@ async def triage_input(state: State, config: RunnableConfig, store: BaseStore):
     if isinstance(follow_up_date, str):
         follow_up_date = datetime.strptime(follow_up_date, "%Y-%m-%d").date()
     
-    print(f"Follow up date: {follow_up_date}, today: {date.today()}")
-    if follow_up_date > date.today():
-        is_past_follow_up = False
-
+        print(f"Follow up date: {follow_up_date}, today: {date.today()}")
+        if follow_up_date > date.today():
+            is_past_follow_up = False
+        else:
+            is_past_follow_up = True
+            
     else:
         is_past_follow_up = True
 
