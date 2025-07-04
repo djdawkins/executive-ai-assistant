@@ -84,7 +84,7 @@ async def send_message(state: State, config, store):
     }
     print("Requesting human input for tool call:", request)
     responses = interrupt([request])
-    response = responses
+    response = responses[0]
     print("Response from human input:", response)
     _text_template = text_template.format(
         prop_street=state["prospect"]["prop_street"] ,
@@ -99,7 +99,7 @@ async def send_message(state: State, config, store):
     msg = {
         "type": "tool",
         "name": tool_call["name"],
-        "content": response,
+        "content": response["args"],
         "tool_call_id": tool_call["id"],
     }
     memory = False # override memory for text responses
