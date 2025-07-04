@@ -5,7 +5,6 @@ from langchain_openai import ChatOpenAI
 from langchain_core.messages import RemoveMessage
 from langgraph.store.base import BaseStore
 
-from eaia.main.get_prospect_info import get_contact_view_data
 from eaia.schemas import (
     State,
     RespondTo,
@@ -52,9 +51,11 @@ async def triage_input(state: State, config: RunnableConfig, store: BaseStore):
     llm = ChatOpenAI(model=model, temperature=0)
     examples = await get_few_shot_examples(state["text"], store, config)
     prompt_config = get_config(config)
+
+    prospect_info = state.get("prospect") or {}
     # prospect_info = get_contact_view_data(state["text"]["from_phone_number"])
-    prospect_info = get_contact_view_data('+16025991760')
-    follow_up_date = prospect_info["follow_up_date"]
+    # prospect_info = get_contact_view_data('+16025991760')
+    follow_up_date = prospect_info.get("follow_up_date", None)
 
     # Convert follow_up_date to a date object if it's a string
     if isinstance(follow_up_date, str):
