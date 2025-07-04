@@ -11,6 +11,14 @@ from eaia.schemas import (
 )
 from eaia.main.config import get_config
 from datetime import datetime, date, timedelta
+from supabase import create_client, Client
+import os
+
+# Initialize Supabase client
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_KEY')
+
+sb_client: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 TEXT_WRITING_INSTRUCTIONS = """You are {full_name}'s executive assistant. You are a top-notch executive assistant who cares about {name} performing as well as possible.
 
@@ -21,13 +29,13 @@ TEXT_WRITING_INSTRUCTIONS = """You are {full_name}'s executive assistant. You ar
 Your job is to help {name} decide how to respond. 
 You can do this by responding with one of the following keywords:
 
-First, opt-in variable is a boolean that indicates whether the prospect has already opted in or not.
+First, opt-in variable can be "true", "False" or "Null" and it indicates whether the prospect has already opted in or not.
 The opt-in value is {opt_in}.
 Second, the contact info confirm  variable is a boolean that indicates whether the contact is confirmed. 
 The contact info confirmed value is {contact_confirm}.
 
 Follow this exactly,
-If the opt-in variable is "False", you should always respond with the `ContactConfirmResponse`.
+If the opt-in variable is "Null", you should always respond with the `ContactConfirmResponse`.
 If the opt-in variable is "True" and contact confirm info variable is "False", you should always respond with the `LandSurvey`.
 """
 draft_prompt = """{instructions}
@@ -84,6 +92,7 @@ async def onboarding(state: State, config: RunnableConfig, store: BaseStore):
         prospect["status"] = "onboarding"
         today = date.today().isoformat()
         prospect["follow_up_date"] = (date.fromisoformat(today) + timedelta(days=1)).isoformat()
+        sb_client.table('leads').upsert(prospect, on_conflict='phone_number').execute()
 
 
     elif response.content == "LandSurvey":
@@ -93,5 +102,6 @@ async def onboarding(state: State, config: RunnableConfig, store: BaseStore):
         prospect["status"] = "ready_for_initial_offer"
         today = date.today().isoformat()
         prospect["follow_up_date"] = (date.fromisoformat(today) + timedelta(days=1)).isoformat()
+        sb_client.table('leads').upsert(prospect, on_conflict='phone_number').execute()
 
     return {"prospect": prospect, "messages": messages}
