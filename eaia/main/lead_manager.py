@@ -310,7 +310,7 @@ class LeadManager:
             
             return {
                 **lead,
-                'message_history': messages_response.data or []
+                # 'message_history': messages_response.data or []
             }
         return None
 
