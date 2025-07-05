@@ -14,6 +14,7 @@ from langchain_core.messages import ToolMessage
 from eaia.main.human_inbox import (
     send_message,
     send_email_draft,
+    send_text_draft,
     notify,
     send_cal_invite,
 )
@@ -28,6 +29,7 @@ from eaia.main.onboarding import (
 from eaia.schemas import (
     State,
 )
+from eaia.main.main import send_text
 
 
 def route_after_triage(
@@ -51,6 +53,7 @@ def take_action(
     state: State,
 ) -> Literal[
     "send_message",
+    "send_text_draft",
     # "rewrite",
     "mark_as_read_node",
     # "send_cal_invite",
@@ -63,7 +66,7 @@ def take_action(
     if tool_call["name"] == "Question":
         return "send_message"
     elif tool_call["name"] == "ResponseTextDraft":
-        return "mark_as_read_node"
+        return "send_text_draft"
     # elif tool_call["name"] == "Ignore":
     #     return "mark_as_read_node"
     # elif tool_call["name"] == "MeetingAssistant":
@@ -92,7 +95,7 @@ def bad_tool_name(state: State):
 def enter_after_human(
     state,
 ) -> Literal[
-    "mark_as_read_node", "draft_response"
+    "mark_as_read_node", "draft_response", "send_text_node"
 ]:
     messages = state.get("messages") or []
     if len(messages) == 0:
@@ -104,8 +107,8 @@ def enter_after_human(
             return "draft_response"
         else:
             execute = messages[-1].tool_calls[0]
-            # if execute["name"] == "ResponseEmailDraft":
-            #     return "send_email_node"
+            if execute["name"] == "ResponseTextDraft":
+                return "send_text_node"
             # elif execute["name"] == "SendCalendarInvite":
             #     return "send_cal_invite_node"
             if execute["name"] == "Ignore":
@@ -134,20 +137,16 @@ def send_cal_invite_node(state, config):
     return {"messages": [ToolMessage(content=message, tool_call_id=tool_call["id"])]}
 
 
-def send_email_node(state, config):
+async def send_text_node(state, config):
     tool_call = state["messages"][-1].tool_calls[0]
     _args = tool_call["args"]
-    email = get_config(config)["email"]
-    new_receipients = _args["new_recipients"]
-    if isinstance(new_receipients, str):
-        new_receipients = json.loads(new_receipients)
-    send_email(
-        state["email"]["id"],
-        _args["content"],
-        email,
-        addn_receipients=new_receipients,
-    )
-
+    print("_args:", _args)
+    phone_number = get_config(config)["phone_number"]
+    print("phone_number:", phone_number)
+    # new_receipients = _args["new_recipients"]
+    # if isinstance(new_receipients, str):
+    #     new_receipients = json.loads(new_receipients)
+    await send_text(_args["content"], "+16613029696")
 
 def mark_as_read_node(state):
     # mark_as_read(state["text"]["id"])
@@ -171,8 +170,8 @@ graph_builder.add_node(send_message)
 
 # graph_builder.add_node(rewrite)
 graph_builder.add_node(mark_as_read_node)
-# graph_builder.add_node(send_email_draft)
-# graph_builder.add_node(send_email_node)
+graph_builder.add_node(send_text_draft)
+graph_builder.add_node(send_text_node)
 
 graph_builder.add_node(bad_tool_name)
 graph_builder.add_node(notify)
@@ -192,9 +191,9 @@ graph_builder.add_edge("send_message", "human_node")
 graph_builder.add_edge("bad_tool_name", "draft_response")
 
 # graph_builder.add_edge("send_cal_invite_node", "draft_response")
-# graph_builder.add_edge("send_email_node", "mark_as_read_node")
+graph_builder.add_edge("send_text_node", "mark_as_read_node")
 # graph_builder.add_edge("rewrite", "send_email_draft")
-# graph_builder.add_edge("send_email_draft", "human_node")
+graph_builder.add_edge("send_text_draft", "human_node")
 graph_builder.add_edge("mark_as_read_node", END)
 graph_builder.add_edge("onboarding", END)
 
