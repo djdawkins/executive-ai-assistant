@@ -50,7 +50,7 @@ TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
 twloClient: TwloClient = TwloClient(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 app = Flask(__name__)
 
-async def send_message(txt_message, phone_number):
+async def send_text(txt_message, phone_number):
 
     print("Ready to setup texting !!!")
                           
@@ -66,7 +66,7 @@ async def send_message(txt_message, phone_number):
     except Exception as e:
         print("Error sending message")
         print(e)
-        
+
 @app.route("/sms", methods=['GET', 'POST'])
 async def webhooks():
 
