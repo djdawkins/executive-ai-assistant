@@ -9,6 +9,15 @@ from langgraph.store.base import BaseStore
 from typing import TypedDict, Literal, Union, Optional
 from langgraph_sdk import get_client
 from eaia.main.config import get_config
+from supabase import create_client, Client
+import os
+from datetime import datetime, date, timedelta
+
+# Initialize Supabase client
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_KEY')
+
+sb_client: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 LGC = get_client()
 
@@ -138,6 +147,117 @@ async def send_message(state: State, config, store):
 
     return {"messages": [msg]}
 
+
+@traceable
+async def send_text_draft(state: State, config, store):
+    prompt_config = get_config(config)
+    memory = prompt_config["memory"]
+    user = prompt_config['name']
+    tool_call = state["messages"][-1].tool_calls[0]
+    request: HumanInterrupt = {
+        "action_request": {"action": tool_call["name"], "args": tool_call["args"]},
+        "config": {
+            "allow_ignore": True,
+            "allow_respond": True,
+            "allow_edit": True,
+            "allow_accept": True,
+        },
+        "description": _generate_email_markdown(state),
+    }
+    response = interrupt([request])[0]
+    prospect = state["prospect"]
+    _text_template = text_template.format(
+        prop_street=prospect["prop_street"] ,
+        prop_city=prospect["prop_city"],
+        prop_state=prospect["prop_state"],
+        first_name=prospect["first_name"],
+        last_name=prospect["last_name"],
+    )
+    print("Requesting human input for tool call:", response["type"])
+    if response["type"] == "response":
+        msg = {
+            "type": "tool",
+            "name": tool_call["name"],
+            "content": f"Error, {user} interrupted and gave this feedback: {response['args']}",
+            "tool_call_id": tool_call["id"],
+        }
+        # if memory:
+        #     await save_email(state, config, store, "email")
+        #     rewrite_state = {
+        #         "messages": [
+        #             {
+        #                 "role": "user",
+        #                 "content": f"Draft a response to this email:\n\n{_email_template}",
+        #             }
+        #         ]
+        #         + state["messages"],
+        #         "feedback": f"Error, {user} interrupted and gave this feedback: {response['args']}",
+        #         "prompt_types": ["tone", "email", "background", "calendar"],
+        #         "assistant_key": config["configurable"].get("assistant_id", "default"),
+        #     }
+        #     await LGC.runs.create(None, "multi_reflection_graph", input=rewrite_state)
+    elif response["type"] == "ignore":
+        msg = {
+            "role": "assistant",
+            "content": "",
+            "id": state["messages"][-1].id,
+            "tool_calls": [
+                {
+                    "id": tool_call["id"],
+                    "name": "Ignore",
+                    "args": {"ignore": True},
+                }
+            ],
+        }
+        # if memory:
+        #     await save_email(state, config, store, "no")
+    elif response["type"] == "edit":
+        msg = {
+            "role": "assistant",
+            "content": state["messages"][-1].content,
+            "id": state["messages"][-1].id,
+            "tool_calls": [
+                {
+                    "id": tool_call["id"],
+                    "name": tool_call["name"],
+                    "args": response["args"]["args"],
+                }
+            ],
+        }
+        # if memory:
+        #     corrected = response["args"]["args"]["content"]
+        #     await save_email(state, config, store, "email")
+        #     rewrite_state = {
+        #         "messages": [
+        #             {
+        #                 "role": "user",
+        #                 "content": f"Draft a response to this email:\n\n{_email_template}",
+        #             },
+        #             {
+        #                 "role": "assistant",
+        #                 "content": state["messages"][-1].tool_calls[0]["args"]["content"],
+        #             },
+        #         ],
+        #         "feedback": f"A better response would have been: {corrected}",
+        #         "prompt_types": ["tone", "email", "background", "calendar"],
+        #         "assistant_key": config["configurable"].get("assistant_id", "default"),
+        #     }
+        #     await LGC.runs.create(None, "multi_reflection_graph", input=rewrite_state)
+    elif response["type"] == "accept":
+        # if memory:
+        #     await save_email(state, config, store, "email")
+        if prospect["status"] == "ready_for_initial_offer":
+            prospect["status"] = "negotiating"
+
+        today = date.today().isoformat()
+        prospect["follow_up_date"] = (date.fromisoformat(today) + timedelta(days=1)).isoformat()
+        print("Updating prospect status to negotiating:", prospect)
+        sb_client.table('leads').upsert(prospect, on_conflict='phone_number').execute()
+
+        return {"prospect": prospect}
+    else:
+        raise ValueError(f"Unexpected response: {response}")
+    return {"messages": [msg]}
 
 @traceable
 async def send_email_draft(state: State, config, store):
