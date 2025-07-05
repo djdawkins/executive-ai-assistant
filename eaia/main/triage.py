@@ -28,6 +28,7 @@ Follow this exactly, the lead status for the prospect and their resonse determin
 If the response is positive and the lead status is "new" or "onboarding", you should always respond `onboard`.
 
 The is_past_follow_up variable is a boolean that indicates whether the follow up date is past or not, and it's value is {is_past_follow_up}.
+If any of the following conditions below are met, you should stop here and make a decision based on the following rules:
 If the lead status is "ready_for_initial_offer", and the is_past_follow_up is "True", you should always respond `text`.
 If the lead status is "ready_for_initial_offer", and the is_past_follow_up is "False", you should always respond `notify`.
 
