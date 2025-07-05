@@ -21,7 +21,7 @@ def format_similar_examples_store(examples):
             template.format(
                 to_phone_number=eg.value["input"]["to_phone_number"],
                 from_phone_number=eg.value["input"]["from_phone_number"],
-                content=eg.value["input"]["page_content"][:400],
+                content=eg.value["input"]["text_content"][:400],
                 result=eg.value["triage"],
             )
         )
