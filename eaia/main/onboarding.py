@@ -13,7 +13,7 @@ from eaia.main.config import get_config
 from datetime import datetime, date, timedelta
 from supabase import create_client, Client
 import os
-from eaia.main.main import send_message
+from eaia.main.main import send_text
 
 # Initialize Supabase client
 SUPABASE_URL = os.getenv('SUPABASE_URL')
@@ -95,7 +95,7 @@ async def onboarding(state: State, config: RunnableConfig, store: BaseStore):
         prospect["follow_up_date"] = (date.fromisoformat(today) + timedelta(days=1)).isoformat()
         sb_client.table('leads').upsert(prospect, on_conflict='phone_number').execute()
 
-        await send_message(text, "+16613029696")
+        await send_text(text, "+16613029696")
 
 
     elif response.content == "LandSurvey":
@@ -106,5 +106,6 @@ async def onboarding(state: State, config: RunnableConfig, store: BaseStore):
         today = date.today().isoformat()
         prospect["follow_up_date"] = (date.fromisoformat(today) + timedelta(days=1)).isoformat()
         sb_client.table('leads').upsert(prospect, on_conflict='phone_number').execute()
+        await send_text(text, "+16613029696")
 
     return {"prospect": prospect, "messages": messages}
