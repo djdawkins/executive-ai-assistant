@@ -30,7 +30,8 @@ from eaia.schemas import (
     State,
 )
 from eaia.main.main import send_text
-
+import os
+TEST_PHONE_NUMBER = os.getenv("TEST_PHONE_NUMBER", "+16025991760")
 
 def route_after_triage(
     state: State,
@@ -146,7 +147,7 @@ async def send_text_node(state, config):
     # new_receipients = _args["new_recipients"]
     # if isinstance(new_receipients, str):
     #     new_receipients = json.loads(new_receipients)
-    await send_text(_args["content"], "+16613029696")
+    await send_text(_args["content"], TEST_PHONE_NUMBER)
 
 def mark_as_read_node(state):
     # mark_as_read(state["text"]["id"])

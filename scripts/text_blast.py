@@ -16,6 +16,7 @@ from eaia.main.main import send_text
 # Initialize Supabase client
 SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY')
+TEST_PHONE_NUMBER = os.getenv('TEST_PHONE_NUMBER')
 
 sb_client: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -40,7 +41,7 @@ async def main():
         state_city = prospect_data['prop_city'] + ", " + prospect_data['prop_state']
         personalized_message = compliacne_text_template.format(name=prospect_data['first_name'], property=state_city)
 
-        await send_text(personalized_message, "+16613029696")
+        await send_text(personalized_message, TEST_PHONE_NUMBER)
 
         time.sleep(10)
 
