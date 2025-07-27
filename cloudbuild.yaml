@@ -39,7 +39,7 @@ availableSecrets:
   - versionName: projects/agent-exec/secrets/LANGSMITH_API_KEY/versions/1
     env: 'LANGSMITH_API_KEY'
   - versionName: projects/agent-exec/secrets/OPENAI_API_KEY/versions/1
-    env: 'OPENAI_API_KEY'
+    env: OPENAI_API_KEY
   - versionName: projects/agent-exec/secrets/SUPABASE_KEY/versions/1
     env: 'SUPABASE_KEY'
   - versionName: projects/agent-exec/secrets/SUPABASE_PW/versions/1
