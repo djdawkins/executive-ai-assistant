@@ -3,6 +3,7 @@
   "dependencies": [
     "."
   ],
+  "env": ".env",
   "graphs": {
     "main": "./eaia/main/graph.py:graph",
     "cron": "./eaia/cron_graph.py:graph",
