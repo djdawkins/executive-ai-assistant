@@ -1,0 +1,39 @@
+volumes:
+    langgraph-data:
+        driver: local
+services:
+    langgraph-redis:
+        image: redis:6
+        ports:
+            - "6379:6379"
+        healthcheck:
+            test: redis-cli ping
+            interval: 5s
+            timeout: 1s
+            retries: 5
+        networks:
+            - langgraph-network
+    langgraph-postgres:
+        image: pgvector/pgvector:pg16
+        ports:
+            - "5433:5432"
+
+        environment:
+            POSTGRES_DB: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: FWW1gdRaYbjTkDtS
+        volumes:
+            - langgraph-data:/var/lib/postgresql/data
+            - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Auto-installs vector
+        healthcheck:
+            test: pg_isready -U postgres
+            start_period: 10s
+            timeout: 1s
+            retries: 5
+            interval: 5s
+        networks:
+            - langgraph-network
+
+networks:
+    langgraph-network:
+

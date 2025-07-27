@@ -1,0 +1,57 @@
+steps:
+  # Install LangGraph CLI and generate Dockerfile in the same step
+  - name: 'python:3.12'
+    entrypoint: 'sh'
+    args: ['-c', 'pip install langgraph-cli && langgraph dockerfile -c langgraph.json Dockerfile']
+
+  # Build Docker image with tag (-t) and specified platform
+  # Created with documentation: https://cloud.google.com/build/docs/building/build-containers
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/langgraph-repo/land-shark-demo-app:latest', '.' ]
+
+  # Push Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/langgraph-repo/land-shark-demo-app:latest']
+
+  # Deploy Docker image to Cloud Run with VPC Connector, using the image from Artifact Registry. 
+  # Created with documentation: https://cloud.google.com/run/docs/deploying
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: ['run', 'deploy', 'task-maistro-demo-app',
+            '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/langgraph-repo/land-shark-demo-app:latest',
+            '--region', 'us-central1',
+            '--platform', 'managed',
+            '--set-env-vars', 'LANGCHAIN_API_KEY=$LANGCHAIN_API_KEY,LANGCHAIN_PROJECT=$LANGCHAIN_PROJECT,LANGSMITH_API_KEY=$LANGSMITH_API_KEY,OPENAI_API_KEY=$OPENAI_API_KEY,REDIS_URI=$REDIS_URI,DATABASE_URI=$DATABASE_URI',
+            '--port', '8000',
+            '--allow-unauthenticated',
+            '--timeout', '1800s',
+            '--memory', '2Gi',
+            '--cpu', '2',
+            '--vpc-connector', 'task-maistro-vpc-con'
+           ]
+substitutions:
+  _PROJECT_ID: $PROJECT_ID
+options:
+  substitution_option: 'ALLOW_LOOSE'
+  logging: CLOUD_LOGGING_ONLY
+
+availableSecrets:
+  secretManager:
+  - versionName: projects/agent-exec/secrets/LANGSMITH_API_KEY/versions/1
+    env: 'LANGSMITH_API_KEY'
+  - versionName: projects/agent-exec/secrets/OPENAI_API_KEY/versions/1
+    env: 'OPENAI_API_KEY'
+  - versionName: projects/agent-exec/secrets/SUPABASE_KEY/versions/1
+    env: 'SUPABASE_KEY'
+  - versionName: projects/agent-exec/secrets/SUPABASE_PW/versions/1
+    env: 'SUPABASE_PW'
+  - versionName: projects/agent-exec/secrets/SUPABASE_URL/versions/1
+    env: 'SUPABASE_URL'
+  - versionName: projects/agent-exec/secrets/TWILIO_ACCOUNT_SID/versions/1
+    env: 'TWILIO_ACCOUNT_SID'
+  - versionName: projects/agent-exec/secrets/TWILIO_AUTH_TOKEN/versions/1
+    env: 'TWILIO_AUTH_TOKEN'
+  - versionName: projects/agent-exec/secrets/TWILIO_PHONE_NUMBER/versions/1
+    env: 'TWILIO_PHONE_NUMBER'
+  - versionName: projects/agent-exec/secrets/TEST_PHONE_NUMBER/versions/1
+    env: 'TEST_PHONE_NUMBER'
