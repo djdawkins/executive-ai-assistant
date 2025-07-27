@@ -21,7 +21,7 @@ steps:
             '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/langgraph-repo/land-shark-demo-app:latest',
             '--region', 'us-central1',
             '--platform', 'managed',
-            '--set-env-vars', 'LANGCHAIN_API_KEY=LANGCHAIN_API_KEY,LANGCHAIN_PROJECT=LANGCHAIN_PROJECT,LANGSMITH_API_KEY=LANGSMITH_API_KEY,OPENAI_API_KEY=$$OPENAI_API_KEY,REDIS_URI=$$REDIS_URI,DATABASE_URI=$$DATABASE_URI',
+            '--set-env-vars', 'LANGCHAIN_API_KEY=LANGCHAIN_API_KEY,LANGCHAIN_PROJECT=$LANGCHAIN_PROJECT,LANGSMITH_API_KEY=LANGSMITH_API_KEY,OPENAI_API_KEY=OPENAI_API_KEY,REDIS_URI=REDIS_URI,DATABASE_URI=DATABASE_URI',
             '--port', '8000',
             '--allow-unauthenticated',
             '--timeout', '1800s',
