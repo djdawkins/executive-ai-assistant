@@ -29,7 +29,7 @@ steps:
             '--cpu', '2',
             '--vpc-connector', 'land-shark-vpc-con'
            ]
-    secretEnv: ['LANGSMITH_API_KEY', 'OPENAI_API_KEY']
+    secretEnv: ['LANGSMITH_API_KEY', 'OPENAI_API_KEY', 'DATABASE_URI']
 substitutions:
   _PROJECT_ID: $PROJECT_ID
 options:
