@@ -17,7 +17,7 @@ steps:
   # Created with documentation: https://cloud.google.com/run/docs/deploying
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
-    args: ['run', 'deploy', 'task-maistro-demo-app',
+    args: ['run', 'deploy', 'land-shark-demo-app',
             '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/langgraph-repo/land-shark-demo-app:latest',
             '--region', 'us-central1',
             '--platform', 'managed',
@@ -27,7 +27,7 @@ steps:
             '--timeout', '1800s',
             '--memory', '2Gi',
             '--cpu', '2',
-            '--vpc-connector', 'task-maistro-vpc-con'
+            '--vpc-connector', 'vpc-connector-subnet'
            ]
 substitutions:
   _PROJECT_ID: $PROJECT_ID
