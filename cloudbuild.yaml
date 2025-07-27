@@ -21,7 +21,7 @@ steps:
             '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/langgraph-repo/land-shark-demo-app:latest',
             '--region', 'us-central1',
             '--platform', 'managed',
-            '--set-env-vars', 'LANGCHAIN_API_KEY=LANGCHAIN_API_KEY,LANGCHAIN_PROJECT=$LANGCHAIN_PROJECT,LANGSMITH_API_KEY=LANGSMITH_API_KEY,OPENAI_API_KEY=OPENAI_API_KEY,REDIS_URI=REDIS_URI,DATABASE_URI=DATABASE_URI',
+            '--set-env-vars', 'LANGCHAIN_API_KEY=LANGCHAIN_API_KEY,LANGCHAIN_PROJECT=LANGCHAIN_PROJECT,LANGSMITH_API_KEY=LANGSMITH_API_KEY,OPENAI_API_KEY=OPENAI_API_KEY,REDIS_URI=REDIS_URI,DATABASE_URI=DATABASE_URI',
             '--port', '8000',
             '--allow-unauthenticated',
             '--timeout', '1800s',
@@ -34,23 +34,3 @@ substitutions:
 options:
   substitution_option: 'ALLOW_LOOSE'
   logging: CLOUD_LOGGING_ONLY
-secrets:
-  secretManager:
-  - versionName: projects/agent-exec/secrets/LANGSMITH_API_KEY/versions/1
-    env: LANGSMITH_API_KEY
-  - versionName: projects/agent-exec/secrets/OPENAI_API_KEY/versions/1
-    env: OPENAI_API_KEY
-  - versionName: projects/agent-exec/secrets/SUPABASE_KEY/versions/1
-    env: SUPABASE_KEY
-  - versionName: projects/agent-exec/secrets/SUPABASE_PW/versions/1
-    env: SUPABASE_PW
-  - versionName: projects/agent-exec/secrets/SUPABASE_URL/versions/1
-    env: SUPABASE_URL
-  - versionName: projects/agent-exec/secrets/TWILIO_ACCOUNT_SID/versions/1
-    env: TWILIO_ACCOUNT_SID
-  - versionName: projects/agent-exec/secrets/TWILIO_AUTH_TOKEN/versions/1
-    env: TWILIO_AUTH_TOKEN
-  - versionName: projects/agent-exec/secrets/TWILIO_PHONE_NUMBER/versions/1
-    env: TWILIO_PHONE_NUMBER
-  - versionName: projects/agent-exec/secrets/TEST_PHONE_NUMBER/versions/1
-    env: TEST_PHONE_NUMBER
