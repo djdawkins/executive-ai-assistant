@@ -22,6 +22,7 @@ steps:
             '--region', 'us-central1',
             '--platform', 'managed',
             '--port', '8000',
+            '--set-env-vars', 'LANGCHAIN_API_KEY=LANGCHAIN_API_KEY,LANGCHAIN_PROJECT=LANGCHAIN_PROJECT,LANGSMITH_API_KEY=$$LANGSMITH_API_KEY,OPENAI_API_KEY=OPENAI_API_KEY,REDIS_URI=REDIS_URI,DATABASE_URI=DATABASE_URI',
             '--allow-unauthenticated',
             '--timeout', '1800s',
             '--memory', '2Gi',
