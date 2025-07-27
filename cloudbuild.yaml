@@ -36,7 +36,7 @@ options:
   logging: CLOUD_LOGGING_ONLY
 availableSecrets:
   secretManager:
-  - versionName: projects/agent-exec/secrets/LANGSMITH_API_KEY/versions/1
+  - versionName: projects/$PROJECT_ID/secrets/LANGSMITH_API_KEY/versions/1
     env: LANGSMITH_API_KEY
-  - versionName: projects/agent-exec/secrets/OPENAI_API_KEY/versions/1
+  - versionName: projects/$PROJECT_ID/secrets/OPENAI_API_KEY/versions/1
     env: OPENAI_API_KEY
