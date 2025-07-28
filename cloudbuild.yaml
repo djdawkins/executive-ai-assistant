@@ -6,7 +6,7 @@ steps:
 
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'echo "Secret One: $$DATABASE_URI" && echo "SeREDIS_URIcret Two: $$REDIS_URI"']
+    args: ['-c', 'echo "Secret One: $$DATABASE_URI" && echo "SeREDIS_URIcret Two: $$REDIS_URI" && echo "LANGSMITH_API_KEY Two: $$LANGSMITH_API_KEY"']
     secretEnv: ['LANGSMITH_API_KEY', 'OPENAI_API_KEY', 'DATABASE_URI', 'REDIS_URI']
 
   # Build Docker image with tag (-t) and specified platform
