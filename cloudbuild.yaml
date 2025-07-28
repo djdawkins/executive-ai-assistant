@@ -22,16 +22,7 @@ steps:
   # Created with documentation: https://cloud.google.com/run/docs/deploying
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: bash
-    args: ['-c', 'run deploy land-shark-demo-app --image us-central1-docker.pkg.dev/$PROJECT_ID/langgraph-repo/land-shark-demo-app:latest --region us-central1',
-            '--platform', 'managed',
-            '--port', '8000',
-            '--set-build-env-vars', 'SUPABASE_URL=$$SUPABASE_URL,SUPABASE_KEY=$$SUPABASE_KEY,LANGSMITH_API_KEY=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,OPENAI_API_KEY=$$OPENAI_API_KEY,REDIS_URI=$$REDIS_URI,DATABASE_URI=postgresql://postgres:ddd.123.@10.35.48.5:5432/postgres',
-            '--allow-unauthenticated',
-            '--timeout', '1800s',
-            '--memory', '2Gi',
-            '--cpu', '2',
-            '--vpc-connector', 'land-shark-vpc-con'
-           ]
+    args: ['-c', 'run deploy land-shark-demo-app --image us-central1-docker.pkg.dev/$PROJECT_ID/langgraph-repo/land-shark-demo-app:latest --region us-central1 --platform managed --port 8000 --set-build-env-vars SUPABASE_URL=$$SUPABASE_URL,SUPABASE_KEY=$$SUPABASE_KEY,LANGSMITH_API_KEY=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,OPENAI_API_KEY=$$OPENAI_API_KEY,REDIS_URI=$$REDIS_URI,DATABASE_URI=postgresql://postgres:ddd.123.@10.35.48.5:5432/postgres --allow-unauthenticated --timeout 1800s --memory 2Gi --cpu 2 --vpc-connector land-shark-vpc-con']
     secretEnv: ['LANGSMITH_API_KEY', 'OPENAI_API_KEY', 'DATABASE_URI', 'REDIS_URI', 'SUPABASE_URL', 'SUPABASE_KEY']
 substitutions:
   _PROJECT_ID: $PROJECT_ID
