@@ -14,6 +14,8 @@ import os
 from datetime import datetime, date, timedelta
 
 # Initialize Supabase client
+print("Initializing Supabase client...")
+print("Supabase URL:", os.getenv('SUPABASE_URL'))
 SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY')
 
