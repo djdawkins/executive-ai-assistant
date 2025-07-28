@@ -31,10 +31,10 @@ steps:
         --port 8000 \
         --set-env-vars SUPABASE_URL=$$SUPABASE_URL \
         --set-env-vars SUPABASE_KEY=$$SUPABASE_KEY \
-        --set-env-vars LANGSMITH_API_KEY=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 \
+        --set-env-vars LANGSMITH_API_KEY=$$LANGSMITH_API_KEY \
         --set-env-vars OPENAI_API_KEY=$$OPENAI_API_KEY \
         --set-env-vars REDIS_URI=$$REDIS_URI \
-        --set-env-vars DATABASE_URI=postgresql://postgres:ddd.123.@10.35.48.5:5432/postgres \
+        --set-env-vars DATABASE_URI=$$DATABASE_URI \
         --allow-unauthenticated \
         --timeout 1800s \
         --memory 2Gi \
