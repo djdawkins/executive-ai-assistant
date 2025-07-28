@@ -52,7 +52,7 @@ availableSecrets:
     env: LANGSMITH_API_KEY
   - versionName: projects/$PROJECT_ID/secrets/OPENAI_API_KEY/versions/1
     env: OPENAI_API_KEY
-  - versionName: projects/$PROJECT_ID/secrets/DATABASE_URI/versions/3
+  - versionName: projects/$PROJECT_ID/secrets/DATABASE_URI/versions/4
     env: DATABASE_URI
   - versionName: projects/$PROJECT_ID/secrets/REDIS_URI/versions/1
     env: REDIS_URI
