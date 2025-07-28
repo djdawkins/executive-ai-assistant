@@ -7,7 +7,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args: ['-c', 'echo "Secret One: $$DATABASE_URI" && echo "SeREDIS_URIcret Two: $$REDIS_URI"']
-    secretEnv: ['SECRET_ONE_ENV_VAR', 'SECRET_TWO_ENV_VAR']
+
   # Build Docker image with tag (-t) and specified platform
   # Created with documentation: https://cloud.google.com/build/docs/building/build-containers
   - name: 'gcr.io/cloud-builders/docker'
