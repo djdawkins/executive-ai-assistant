@@ -27,7 +27,7 @@ steps:
             '--region', 'us-central1',
             '--platform', 'managed',
             '--port', '8000',
-            '--set-env-vars', 'LANGCHAIN_API_KEY=$_LANGCHAIN_API_KEY,LANGCHAIN_PROJECT=$_LANGCHAIN_PROJECT,LANGSMITH_API_KEY=$$LANGSMITH_API_KEY,OPENAI_API_KEY=$$OPENAI_API_KEY,REDIS_URI=$$REDIS_URI,DATABASE_URI=$DATABASE_URI',
+            '--set-env-vars', 'LANGCHAIN_API_KEY=$_LANGCHAIN_API_KEY,LANGCHAIN_PROJECT=$_LANGCHAIN_PROJECT,LANGSMITH_API_KEY=$$LANGSMITH_API_KEY,OPENAI_API_KEY=$$OPENAI_API_KEY,REDIS_URI=$$REDIS_URI,DATABASE_URI=postgresql://postgres:ddd.123.@10.35.48.3:5432/postgres',
             '--allow-unauthenticated',
             '--timeout', '1800s',
             '--memory', '2Gi',
