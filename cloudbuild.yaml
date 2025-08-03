@@ -33,13 +33,14 @@ steps:
         --set-env-vars SUPABASE_KEY=$$SUPABASE_KEY \
         --set-env-vars LANGSMITH_API_KEY=$$LANGSMITH_API_KEY \
         --set-env-vars OPENAI_API_KEY=$$OPENAI_API_KEY \
+        --set-env-vars REDIS_URI=$$REDIS_URI \
         --set-env-vars DATABASE_URI=$$DATABASE_URI \
         --allow-unauthenticated \
         --timeout 1800s \
         --memory 2Gi \
         --cpu 2 \
         --vpc-connector land-shark-vpc-con
-    secretEnv: ['LANGSMITH_API_KEY', 'OPENAI_API_KEY', 'DATABASE_URI', 'SUPABASE_URL', 'SUPABASE_KEY']
+    secretEnv: ['LANGSMITH_API_KEY', 'OPENAI_API_KEY', 'DATABASE_URI', 'REDIS_URI', 'SUPABASE_URL', 'SUPABASE_KEY']
 substitutions:
   _PROJECT_ID: $PROJECT_ID
 options:
@@ -53,6 +54,8 @@ availableSecrets:
     env: OPENAI_API_KEY
   - versionName: projects/$PROJECT_ID/secrets/DATABASE_URI/versions/4
     env: DATABASE_URI
+  - versionName: projects/$PROJECT_ID/secrets/REDIS_URI/versions/2
+    env: REDIS_URI
   - versionName: projects/$PROJECT_ID/secrets/SUPABASE_URL/versions/1
     env: 'SUPABASE_URL'
   - versionName: projects/$PROJECT_ID/secrets/SUPABASE_KEY/versions/1
