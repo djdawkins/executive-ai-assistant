@@ -24,6 +24,7 @@ twloClient: TwloClient = TwloClient(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 def send_text(txt_message, phone_number):
 
     logger.info("Ready to setup texting !!!")
+    logger.info(phone_number)
                           
     try:
 
@@ -35,5 +36,7 @@ def send_text(txt_message, phone_number):
      )
         
     except Exception as e:
+        print("Error sending message")
+        print(e)
         logger.info("Error sending message")
         logger.info(e)

@@ -143,7 +143,7 @@ async def send_text_node(state, config):
     _args = tool_call["args"]
     print("_args:", _args)
     phone_number = get_config(config)["phone_number"]
-    print("phone_number:", phone_number)
+    print("phone_number:", TEST_PHONE_NUMBER)
     # new_receipients = _args["new_recipients"]
     # if isinstance(new_receipients, str):
     #     new_receipients = json.loads(new_receipients)
