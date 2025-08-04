@@ -29,7 +29,7 @@ from eaia.main.onboarding import (
 from eaia.schemas import (
     State,
 )
-from eaia.main.main import send_text
+from eaia.main.sms_text import send_text
 import os
 TEST_PHONE_NUMBER = os.getenv("TEST_PHONE_NUMBER", "+16025991760")
 
