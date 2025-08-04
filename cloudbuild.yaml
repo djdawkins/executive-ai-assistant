@@ -38,12 +38,13 @@ steps:
         --set-env-vars TWILIO_PHONE_NUMBER=$$TWILIO_PHONE_NUMBER \
         --set-env-vars TWILIO_ACCOUNT_SID=$$TWILIO_ACCOUNT_SID \
         --set-env-vars TWILIO_AUTH_TOKEN=$$TWILIO_AUTH_TOKEN \
+        --set-env-vars TEST_PHONE_NUMBER=$$TEST_PHONE_NUMBER \
         --allow-unauthenticated \
         --timeout 1800s \
         --memory 2Gi \
         --cpu 2 \
         --vpc-connector land-shark-vpc-con
-    secretEnv: ['LANGSMITH_API_KEY', 'OPENAI_API_KEY', 'DATABASE_URI', 'REDIS_URI', 'SUPABASE_URL', 'SUPABASE_KEY', 'TWILIO_PHONE_NUMBER', 'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN']
+    secretEnv: ['LANGSMITH_API_KEY', 'OPENAI_API_KEY', 'DATABASE_URI', 'REDIS_URI', 'SUPABASE_URL', 'SUPABASE_KEY', 'TWILIO_PHONE_NUMBER', 'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TEST_PHONE_NUMBER']
 substitutions:
   _PROJECT_ID: $PROJECT_ID
 options:
@@ -69,3 +70,5 @@ availableSecrets:
     env: 'TWILIO_ACCOUNT_SID'
   - versionName: projects/$PROJECT_ID/secrets/TWILIO_AUTH_TOKEN/versions/1
     env: 'TWILIO_AUTH_TOKEN'
+  - env: 'TEST_PHONE_NUMBER'
+    versionName: projects/$PROJECT_ID/secrets/TEST_PHONE_NUMBER/versions/1
